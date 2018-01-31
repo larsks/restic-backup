@@ -6,8 +6,6 @@ Before=restic-backup.target
 Type=oneshot
 WorkingDirectory=/home/backup/profile/%i
 User=backup
-EnvironmentFile=/home/backup/config
-EnvironmentFile=/home/backup/profile/%i/config
 ExecStart=/usr/local/bin/restic-backup
 
 [Install]

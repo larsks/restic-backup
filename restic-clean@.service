@@ -1,13 +1,11 @@
 [Unit]
-Description=Clean up restic backups with tag %i
+Description=Clean up %I backups
 After=restic-backup.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/home/backup
+WorkingDirectory=/home/backup/profile/%i
 User=backup
-Environment=RESTIC_POLICY=%I
-EnvironmentFile=/home/backup/config
 ExecStart=/usr/local/bin/restic-clean
 
 [Install]

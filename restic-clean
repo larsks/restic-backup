@@ -1,17 +1,31 @@
 #!/bin/bash
 
-: ${RESTIC_POLICY_DIR:=$HOME/policy}
+set -eu
+
+: ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
+
+set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
+
+if [ -f config ]; then
+	set -o allexport; . config; set +o allexport
+fi
 
 _args=()
 
-if [ "$RESTIC_POLICY" ]; then
-	_args+=(--tag $RESTIC_POLICY)
+if [ -d policy ]; then
+	policy_name=$(basename $(readlink policy))
+	_args+=(--tag $policy_name)
 
-	if [ -f "$RESTIC_POLICY_DIR/$RESTIC_POLICY/clean_args" ]; then
-		mapfile -t -O ${#_args[@]} _args \
-			< "$RESTIC_POLICY_DIR/$RESTIC_POLICY/clean_args"
+	if [ -f "policy/clean_args" ]; then
+		mapfile -t -O ${#_args[@]} _args < policy/clean_args
 	fi
 fi
 
+if [ -f clean_args ]; then
+	mapfile -t -O ${#_args[@]} _args < clean_args
+fi
+
 set -x
-exec restic forget --prune ${_args[*]} "$@"
+exec restic forget \
+	${_args[*]} \
+	"$@"

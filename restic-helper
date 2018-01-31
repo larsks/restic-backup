@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+: ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
+
+set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
+
+if [ -f config ]; then
+	set -o allexport; . config; set +o allexport
+fi
+
+set -x
+exec restic "$@"
