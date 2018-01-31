@@ -3,6 +3,7 @@ Description=Clean up restic backups with tag %i
 After=restic-backup.target
 
 [Service]
+Type=oneshot
 WorkingDirectory=/home/backup
 User=backup
 EnvironmentFile=/home/backup/config

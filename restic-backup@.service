@@ -3,6 +3,7 @@ Description=Back up %I using restic
 Before=restic-backup.target
 
 [Service]
+Type=oneshot
 WorkingDirectory=/home/backup/profile/%i
 User=backup
 EnvironmentFile=/home/backup/config
