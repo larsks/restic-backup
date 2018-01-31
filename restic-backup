@@ -1,5 +1,7 @@
 #!/bin/bash
 
+: ${RESTIC_POLICY_DIR:=$HOME/policy}
+
 _args=()
 
 if [ -f exclude ]; then
