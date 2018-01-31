@@ -1,0 +1,17 @@
+#!/bin/bash
+
+: ${RESTIC_POLICY_DIR:-$HOME/policy}
+
+_args=()
+
+if [ "$RESTIC_POLICY" ]; then
+	_args+=(--tag $RESTIC_POLICY)
+
+	if [ -f "$RESTIC_POLICY_DIR/$RESTIC_POLICY/clean_args" ]; then
+		mapfile -t -O ${#_args[@]} _args \
+			< "$RESTIC_POLICY_DIR/$RESTIC_POLICY/clean_args"
+	fi
+fi
+
+set -x
+exec restic forget --prune ${_args[*]} "$@"

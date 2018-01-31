@@ -1,0 +1,13 @@
+[Unit]
+Description=Back up %I using restic
+Before=restic-backup.target
+
+[Service]
+WorkingDirectory=/home/backup/profile/%i
+User=backup
+EnvironmentFile=/home/backup/config
+EnvironmentFile=/home/backup/profile/%i/config
+ExecStart=/usr/local/bin/restic-backup
+
+[Install]
+WantedBy=multi-user.target
