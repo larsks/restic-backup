@@ -4,39 +4,60 @@ set -eu
 
 : ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
 
+log () {
+	echo "${0##*/}: $1" >&2
+}
+
+error () {
+	log "ERROR: $1"
+	exit 1
+}
+
 action=$1
 shift
 
 if [ -f "$RESTIC_GLOBAL_CONFIG" ]; then
+	log "reading configuration from $RESTIC_GLOBAL_CONFIG"
 	set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
 fi
 
 if [ -f config ]; then
+	log "reading configuration from ./config"
 	set -o allexport; . ./config; set +o allexport
 fi
 
 if [ -x before ]; then
 	tmpfile=$(mktemp ./beforeXXXXXX)
 	trap "rm -f $tmpfile" EXIT
+	log "running before script"
 	if ! ./before $action > $tmpfile; then
-		echo "ERROR: before script failed" >&2
+		error "before script failed"
 		exit 1
 	fi
 
-	set -o allexport; . $tmpfile; set +o allexport
+	if [ -s $tmpfile ]; then
+		log "reading configuration from before script"
+		set -o allexport; . $tmpfile; set +o allexport
+	fi
 fi
 
 if [ "$action" = "backup" ]; then
+	log "running restic-backup $*"
 	restic-backup "$@"
 elif [ "$action" = "clean" ]; then
+	log "running restic-clean $*"
 	restic-clean "$@"
+elif [ "$action" = "shell" ]; then
+	PS1='(restic) $ ' ${SHELL:-/bin/bash --norc}
 else
+	log "running restic $action $*"
 	restic $action "$@"
 fi
 
 if [ -x after ]; then
+	log "running after script"
 	if ! ./after $action; then
-		echo "ERROR: after script failed" >&2
+		error "after script failed"
 		exit 1
 	fi
 fi
