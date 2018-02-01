@@ -2,18 +2,10 @@
 
 set -eu
 
-: ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
-
-set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
-
-if [ -f config ]; then
-	set -o allexport; . config; set +o allexport
-fi
-
 _args=()
 
 if [ -d policy ]; then
-	policy_name=$(basename $(readlink policy))
+	policy_name=$(basename $(readlink -f policy))
 	_args+=(--tag $policy_name)
 
 	if [ -f "policy/clean_args" ]; then

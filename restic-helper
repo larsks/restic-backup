@@ -4,11 +4,39 @@ set -eu
 
 : ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
 
-set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
+action=$1
+shift
 
-if [ -f config ]; then
-	set -o allexport; . config; set +o allexport
+if [ -f "$RESTIC_GLOBAL_CONFIG" ]; then
+	set -o allexport; . "$RESTIC_GLOBAL_CONFIG"; set +o allexport
 fi
 
-set -x
-exec restic "$@"
+if [ -f config ]; then
+	set -o allexport; . ./config; set +o allexport
+fi
+
+if [ -x before ]; then
+	tmpfile=$(mktemp ./beforeXXXXXX)
+	trap "rm -f $tmpfile" EXIT
+	if ! ./before $action > $tmpfile; then
+		echo "ERROR: before script failed" >&2
+		exit 1
+	fi
+
+	set -o allexport; . $tmpfile; set +o allexport
+fi
+
+if [ "$action" = "backup" ]; then
+	restic-backup "$@"
+elif [ "$action" = "clean" ]; then
+	restic-clean "$@"
+else
+	restic $action "$@"
+fi
+
+if [ -x after ]; then
+	if ! ./after $action; then
+		echo "ERROR: after script failed" >&2
+		exit 1
+	fi
+fi
