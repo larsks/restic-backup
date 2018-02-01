@@ -3,6 +3,7 @@
 set -eu
 
 : ${RESTIC_GLOBAL_CONFIG:=$HOME/config}
+: ${RESTIC_NO_SCRIPTS:=0}
 
 log () {
 	echo "${0##*/}: $1" >&2
@@ -10,8 +11,27 @@ log () {
 
 error () {
 	log "ERROR: $1"
-	exit 1
+	exit ${2:-1}
 }
+
+while [ $# -gt 0 ]; do
+	case $1 in
+	(--no-scripts)
+		RESTIC_NO_SCRIPTS=1
+		shift
+		;;
+
+	(--)	shift
+		break
+		;;
+
+	(-*)	error "no such option: $1" 2
+		;;
+
+	(*)	break
+		;;
+	esac
+done
 
 action=$1
 shift
@@ -26,7 +46,7 @@ if [ -f config ]; then
 	set -o allexport; . ./config; set +o allexport
 fi
 
-if [ -x before ]; then
+if [ -x before ] && [ "$RESTIC_NO_SCRIPTS" != 1 ]; then
 	tmpfile=$(mktemp ./beforeXXXXXX)
 	trap "rm -f $tmpfile" EXIT
 	log "running before script"
@@ -54,7 +74,7 @@ else
 	restic $action "$@"
 fi
 
-if [ -x after ]; then
+if [ -x after ] && [ "$RESTIC_NO_SCRIPTS" != 1 ]; then
 	log "running after script"
 	if ! ./after $action; then
 		error "after script failed"
