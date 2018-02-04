@@ -1,0 +1,28 @@
+#!/bin/sh
+
+: ${BACKUP_HOME:=$HOME}
+
+usage () {
+	echo "$0: usage: ..."
+}
+
+if [ $# -lt 2 ]; then
+	usage >&2
+	exit 2
+fi
+
+schedule=$1
+shift
+
+action=$1
+shift
+
+for profile in ${BACKUP_HOME}/schedule/$schedule/${action}-*; do
+	[ -d "$profile" ] || continue
+
+	(
+		cd $profile
+		echo "* ${action} $(basename $profile)"
+		restic-run $action
+	)
+done

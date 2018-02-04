@@ -1,0 +1,11 @@
+[Unit]
+Description=Run %I backups
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/backup
+User=backup
+ExecStart=/usr/local/bin/restic-run-schedule %I backup
+
+[Install]
+WantedBy=multi-user.target

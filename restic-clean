@@ -18,6 +18,6 @@ if [ -f clean_args ]; then
 fi
 
 set -x
-exec restic forget \
+exec restic forget --prune \
 	${_args[*]} \
 	"$@"

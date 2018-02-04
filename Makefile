@@ -3,13 +3,16 @@ bindir=$(PREFIX)/bin
 unitdir=/etc/systemd/system
 
 SCRIPTS = \
-	  restic-helper \
+	  restic-run \
+	  restic-run-schedule \
 	  restic-backup \
 	  restic-clean
 
 SERVICES = \
 	restic-backup@.service \
-	restic-clean@.service
+	restic-clean@.service \
+	restic-backup-schedule@.service \
+	restic-clean-schedule@.service
 
 all:
 

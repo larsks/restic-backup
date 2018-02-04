@@ -6,7 +6,7 @@ Before=restic-backup.target
 Type=oneshot
 WorkingDirectory=/home/backup/profile/%i
 User=backup
-ExecStart=/usr/local/bin/restic-helper backup
+ExecStart=/usr/local/bin/restic-run backup
 
 [Install]
 WantedBy=multi-user.target

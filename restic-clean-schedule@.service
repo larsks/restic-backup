@@ -1,0 +1,12 @@
+[Unit]
+Description=Run %I maintenance tasks
+After=restic-run-schedule@%i.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/backup
+User=backup
+ExecStart=/usr/local/bin/restic-run-schedule %I clean
+
+[Install]
+WantedBy=multi-user.target
