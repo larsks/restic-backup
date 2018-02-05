@@ -2,7 +2,7 @@
 
 set -eu
 
-_args=()
+declare -a _args
 
 if [ -d policy ]; then
 	policy_name=$(basename $(readlink -f policy))
@@ -19,5 +19,5 @@ fi
 
 set -x
 exec restic forget --prune \
-	${_args[*]} \
+	${_args+${_args[*]}} \
 	"$@"

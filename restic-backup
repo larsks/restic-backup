@@ -2,7 +2,7 @@
 
 set -eu
 
-_args=()
+declare -a _args
 
 if [ -f exclude ]; then
 	_args+=(--exclude-file exclude)
@@ -23,6 +23,6 @@ fi
 
 set -x
 restic backup --exclude-if-present=.nobackup \
-	${_args[*]} \
+	${_args+${_args[*]}} \
 	$BACKUP_SOURCE_DIR \
 	"$@"
